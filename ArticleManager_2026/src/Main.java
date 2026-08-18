@@ -1,186 +1,200 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+//import jdk.jshell.execution.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+// 게시글 수정 => setter 활용.
+// 게시글 상세보기
 public class Main {
+  static List<Article> articles = new ArrayList<>();
+
   public static void main(String[] args) {
-    System.out.println("프로그램 시작");
+
+    System.out.println("== 프로그램 시작 ==");
     Scanner sc = new Scanner(System.in);
-    int article_count = 0;
-
-    List<Article> articles = new ArrayList<>();
-    articles.add(new Article(1, "테스트 제목 1", "테스트 내용 1", "테스트 시간1"));
-    articles.add(new Article(2, "테스트 제목 2", "테스트 내용 2", "테스트 시간2"));
-    articles.add(new Article(3, "테스트 제목 3", "테스트 내용 3", "테스트 시간3"));
-
-    article_count = 3;
+    int lastArticleId = 3;
+    makeTestDate();
 
     while (true) {
-      System.out.println("명령어 ) ");
+      System.out.print("명령어 ) ");
       String cmd = sc.nextLine().trim();
 
-      /* 게시글 삭제 */
-      if (cmd.startsWith("article delete ")) {
-        String delete_count_id = cmd.replace("article delete ", "");
-        int delete_count = Integer.parseInt(delete_count_id.trim());
-
-        Article target_delete_article = null;
-        for (Article article : articles) {
-          if (article.getArticle_id() == delete_count) {
-            target_delete_article = article;
-            break;
-          }
-        }
-        if (target_delete_article == null) {
-          System.out.println("해당 게시글은 없습니다.");
-          continue;
-        }
-        articles.remove(target_delete_article);
-        System.out.printf("%d번 게시글이 삭제되었습니다.\n", delete_count);
-      }
-
-      /* 게시글 수정 */
-      if (cmd.startsWith("article modify")) {
-        String modify_count_id = cmd.replace("article modify ", "");
-        int modify_id = Integer.parseInt(modify_count_id);
-
-        Article target_modify_article = null;
-        for (Article article : articles) {
-          if (article.getArticle_id() == modify_id) {
-            target_modify_article = article;
-            break;
-          }
-        }
-        if (target_modify_article == null) {
-          System.out.println("해당 게시글은 없습니다.");
-          continue;
-        }
-        System.out.println("기존 제목 : " + target_modify_article.getArticle_header());
-        System.out.println("기존 내용 : " + target_modify_article.getArticle_detail());
-        System.out.print("제목 : ");
-        String modify_header = sc.nextLine().trim();
-        System.out.print("내용 : ");
-        String modify_detail = sc.nextLine().trim();
-        target_modify_article.setArticle_header(modify_header);
-        target_modify_article.setArticle_detail(modify_detail);
-        System.out.printf("%d번 게시글이 수정되었습니다.\n", target_modify_article.getArticle_id());
-      }
-
-
-      /* 게시글 상세보기 */
-      if (cmd.startsWith("article detail ")) {
-        int detail_id = Integer.parseInt(cmd.split(" ")[2]);
-        Article target_detail_article = null;
-
-        for (Article article : articles) {
-          if (article.getArticle_id() == detail_id) {
-            target_detail_article = article;
-            break;
-          }
-        }
-        if (target_detail_article == null) {
-          System.out.println("해당 게시글은 없습니다.");
-          continue;
-        }
-        System.out.println("번호 : " + target_detail_article.getArticle_id());
-        System.out.println("날짜 : " + target_detail_article.getArticle_time());
-        System.out.println("제목 : " + target_detail_article.getArticle_header());
-        System.out.println("내용 : " + target_detail_article.getArticle_detail());
-        System.out.println();
-      }
-
-
-      /* 게시글 작성 */
-      if (cmd.equals("article write")) {
-        System.out.println("== 게시글 작성 ==");
-        int article_id = article_count + 1;
-        System.out.println("제목을 입력하세요");
-        String article_header = sc.nextLine().trim();
-
-        System.out.println("내용을 입력하세요");
-        String article_detail = sc.nextLine().trim();
-
-        DateTimeFormatter DateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String article_time = LocalDateTime.now().format(DateTimeFormat);
-
-        Article article = new Article(article_id, article_header, article_detail, article_time);
-        articles.add(article);
-
-        System.out.printf("%d번 글이 작성되었습니다.\n", article_id);
-        article_count++;
-      } else if (cmd.equals("article list")) {
-        System.out.println("==게시물 목록==");
-        if (articles.size() == 0) {
-          System.out.println("게시글이 존재하지 않습니다.");
-        } else {
-          System.out.println("  번호  /   제목   /   내용  ");
-          for (int i = articles.size() - 1; i >= 0; i--) {
-            Article article = articles.get(i);
-            System.out.printf("  %d  /   %s   /  %s   \n", article.getArticle_id(), article.getArticle_header(), article.getArticle_detail());
-          }
-        }
-      }
-      /* 프로그램 종료 */
       if (cmd.equals("exit")) {
         break;
       } else if (cmd.length() == 0) {
-        System.out.println("명령어를 입력해주세요");
+        System.out.println("명령어를 입력해주세요.");
         continue;
       }
+      if (cmd.equals("article write")) {
+        System.out.println("== 게시글 작성 ==");
+        int id = lastArticleId + 1;
+        System.out.print("제목 : ");
+        String title = sc.nextLine().trim();
+
+        System.out.print("내용 : ");
+        String body = sc.nextLine().trim();
+
+        String regDate = Util.getNowStr();
+        String updateDate = Util.getNowStr();
+
+        Article article = new Article(id, regDate, updateDate, title, body);
+        articles.add(article);
+
+        System.out.printf("%d번 글이 작성되었습니다.\n", id);
+        lastArticleId++;
+      } else if (cmd.equals("article list")) {
+        System.out.println("== 게시물 목록 ==");
+        if (articles.size() == 0) {
+          System.out.println("게시글이 존재하지 않습니다.");
+        } else {
+          System.out.println("  번호  /  날짜  /  제목  /  내용  ");
+          for (int i = articles.size() - 1; i >= 0; i--) {
+            Article article = articles.get(i);
+            if (Util.getNowStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
+              System.out.printf("  %d  /  %s  /  %s  /  %s  \n", article.getId(), article.getRegDate().split(" ")[1], article.getTitle(), article.getBody());
+            } else {
+              System.out.printf("  %d  /  %s  /  %s  /  %s  \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
+            }
+          }
+        }
+      } else if (cmd.startsWith("article delete")) {
+        System.out.println("== 게시글 삭제 ==");
+        int id = Integer.parseInt(cmd.split(" ")[2]);
+
+        Article foundArticle = null;
+        for (Article article : articles) {
+          if (article.getId() == id) {
+            foundArticle = article;
+            break;
+          }
+        }
+        if (foundArticle == null) {
+          System.out.println("해당 게시글은 없습니다.");
+          continue;
+        }
+        articles.remove(foundArticle);
+        System.out.println(id + "번 게시글이 삭제되었습니다.");
+      } else if (cmd.startsWith("article modify")) {
+        int id = Integer.parseInt(cmd.split(" ")[2]);
+
+        Article foundArticle = null;
+        for (Article article : articles) {
+          if (article.getId() == id) {
+            foundArticle = article;
+            break;
+          }
+        }
+        if (foundArticle == null) {
+          System.out.println("해당 게시글은 없습니다.");
+          continue;
+        }
+        System.out.println("기존 title : " + foundArticle.getTitle());
+        System.out.println("기존 body : " + foundArticle.getBody());
+
+        System.out.print("새 제목 : ");
+        String newTitle = sc.nextLine().trim();
+
+        System.out.print("새 내용 : ");
+        String newBody = sc.nextLine().trim();
+
+        foundArticle.setTitle(newTitle);
+        foundArticle.setBody(newBody);
+
+        foundArticle.setUpdateDate(Util.getNowStr());
+        System.out.println(id + "번 게시글이 수정되었습니다.");
+      } else if (cmd.startsWith("article detail")) {
+        System.out.println("== 게시글 상세보기 ==");
+        int id = Integer.parseInt(cmd.split(" ")[2]);
+
+        Article foundArticle = null;
+        for (Article article : articles) {
+          if (article.getId() == id) {
+            foundArticle = article;
+            break;
+          }
+        }
+        if (foundArticle == null) {
+          System.out.println("해당 게시글은 없습니다.");
+          continue;
+        }
+        System.out.println("번호 : " + foundArticle.getId());
+        System.out.println("작성날짜 : " + foundArticle.getRegDate());
+        System.out.println("수정날짜 : " + foundArticle.getUpdateDate());
+        System.out.println("제목 : " + foundArticle.getTitle());
+        System.out.println("내용 : " + foundArticle.getBody());
+      } else {
+        System.out.println("사용할 수 없는 명령어 입니다.");
+      }
     }
-    System.out.println("프로그램 종료");
+    System.out.println("== 프로그램 종료 ==");
     sc.close();
+  }
+
+  private static void makeTestDate() {
+    System.out.println("== 테스트 데이터 생성 ==");
+    articles.add(new Article(1, "2026-08-14 18:06:00", "2026-08-17 17:00:01", "제목1", "내용1"));
+    articles.add(new Article(2, Util.getNowStr(), Util.getNowStr(), "제목2", "내용2"));
+    articles.add(new Article(3, Util.getNowStr(), Util.getNowStr(), "제목3", "내용3"));
   }
 }
 
+
 class Article {
-  private int article_id;
-  private String article_header;
-  private String article_detail;
-  private String article_time;
+  private int id;
+  private String title;
+  private String body;
+  private String updateDate;
+  private String regDate;
 
-  public int getArticle_id() {
-    return article_id;
-  } // getter
-
-  public String getArticle_header() {
-    return article_header;
+  public String getRegDate() {
+    return regDate;
   }
 
-  public String getArticle_detail() {
-    return article_detail;
+  public String getUpdateDate() {
+    return updateDate;
   }
 
-  public String getArticle_time() {
-    return article_time;
+
+  public void setUpdateDate(String updateDate) {
+    this.updateDate = updateDate;
   }
 
-  public void setArticle_id(int article_id) {
-    this.article_id = article_id;
-  } // setter
-
-  public void setArticle_header(String article_header) {
-    this.article_header = article_header;
+  public void setRegDate(String regDate) {
+    this.regDate = regDate;
   }
 
-  public void setArticle_detail(String article_detail) {
-    this.article_detail = article_detail;
+
+  public void setId(int id) {
+    this.id = id;
   }
 
-  public void setArticle_time(String article_time) {
-    this.article_time = article_time;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
-  public Article(int article_id, String article_header, String article_detail, String article_time) {
-    this.article_id = article_id;
-    this.article_header = article_header;
-    this.article_detail = article_detail;
-    this.article_time = article_time;
+  public void setBody(String body) {
+    this.body = body;
   }
 
-  public String toString() {
-    return article_id + " " + article_header + " " + article_detail + " " + article_time;
+
+  public int getId() {
+    return id;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getBody() {
+    return body;
+  }
+
+  public Article(int id, String regDate, String updateDate, String title, String body) {
+    this.id = id;
+    this.regDate = regDate;
+    this.updateDate = updateDate;
+    this.title = title;
+    this.body = body;
   }
 }
